@@ -35,3 +35,4 @@ input:focus,textarea:focus{border-color:#9cbff3;box-shadow:0 0 0 3px rgba(134,19
 .home-card:not(:disabled):active{background:linear-gradient(135deg,#f8f8ff,#e9ebfc);box-shadow:0 6px 16px rgba(85,97,167,.12);transform:scale(.985)}
 /* Consistent brand header across every page. */
 header{background:#4f5ee8;color:#fff;border-bottom:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.settings-icon{width:24px;height:24px;display:block;margin:auto;color:#fff}
