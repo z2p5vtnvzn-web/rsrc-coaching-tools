@@ -36,3 +36,6 @@ input:focus,textarea:focus{border-color:#9cbff3;box-shadow:0 0 0 3px rgba(134,19
 /* Consistent brand header across every page. */
 header{background:#4f5ee8;color:#fff;border-bottom:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
 .settings-icon{width:24px;height:24px;display:block;margin:auto;color:#fff}
+
+/* Member treatment cards share the same soft surfaces and export controls. */
+.member-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.member-fields>div{min-width:0}.member-fields input{min-width:0;max-width:100%}.member-photos{grid-template-columns:repeat(2,minmax(0,1fr))}.member-photo-frame{position:relative;aspect-ratio:3/4;overflow:hidden}.member-photo-frame img,.member-photo-frame .photo-add{height:100%;width:100%}.member-photo-frame .photo-num{z-index:1}.photo-watermark{position:absolute;top:8px;right:8px;width:24px;height:24px;background:#525ee0;opacity:.75;mask:url('./watermark.png') center/contain no-repeat;-webkit-mask:url('./watermark.png') center/contain no-repeat;pointer-events:none}.member-photos .photo{border-style:solid}.member-fields input[type=date]{-webkit-appearance:none;appearance:none;min-height:46px}.member-fields input[type=date]::-webkit-date-and-time-value{text-align:left}
