@@ -1,4 +1,4 @@
-const CACHE='rsrc-coach-v12';
+const CACHE='rsrc-coach-v14';
 const ASSETS=['./','./index.html','./style.css','./app.js','./card-renderer.js','./watermark.png','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png','./manifest.webmanifest'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('rsrc-coach-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

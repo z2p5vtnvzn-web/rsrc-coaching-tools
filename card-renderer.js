@@ -26,15 +26,7 @@
   function render(card,photos,watermark,width=1080,createCanvas){
     createCanvas=createCanvas||(()=>document.createElement('canvas'));
     const canvas=createCanvas(),measure=createCanvas().getContext('2d');
-    let tintedWatermark=null;
-    if(watermark){
-      tintedWatermark=createCanvas();
-      tintedWatermark.width=watermark.width;tintedWatermark.height=watermark.height;
-      const tint=tintedWatermark.getContext('2d');
-      tint.drawImage(watermark,0,0);
-      tint.globalCompositeOperation='source-in';
-      tint.fillStyle='#525ee0';tint.fillRect(0,0,watermark.width,watermark.height);
-    }
+    const iconWatermark=watermark;
     const margin=40,contentWidth=1000,gap=20,lineHeight=44;
     measure.font=font(48,600);
     const titleLines=wrap(measure,card.title||'动作名称',contentWidth);
@@ -72,7 +64,7 @@
           const markH=Math.min(38,vh-inset*2,(vw-inset*2)*watermark.height/watermark.width);
           const markW=markH*watermark.width/watermark.height;
           ctx.globalAlpha=.75;
-          ctx.drawImage(tintedWatermark,v.right-inset-markW,v.y+inset,markW,markH);
+          ctx.drawImage(iconWatermark,v.right-inset-markW,v.y+inset,markW,markH);
         }
         ctx.restore();
       }else{
@@ -112,8 +104,7 @@
     ctx.textAlign='left';ctx.fillStyle=dark;ctx.font=font(72,600);
     titles.forEach((line,i)=>ctx.fillText(line,40,145+i*86));
     ctx.font=font(32);ctx.fillStyle=muted;ctx.textAlign='right';members.forEach((line,i)=>ctx.fillText(line,1040,145+i*44));
-    let mark=null;
-    if(watermark){mark=createCanvas();mark.width=watermark.width;mark.height=watermark.height;const m=mark.getContext('2d');m.drawImage(watermark,0,0);m.globalCompositeOperation='source-in';m.fillStyle='#525ee0';m.fillRect(0,0,mark.width,mark.height)}
+    const mark=watermark;
     const labels=['处理前','处理后'];
     for(let i=0;i<2;i++){
       const slot={x:40+i*(pw+gap),y:photoY,w:pw,h:ph};
@@ -141,7 +132,44 @@
     ctx.textAlign='right';ctx.fillText(card.signature||'',1040,height-28,480);
     return canvas;
   }
-  const api={render,renderMember,photoBounds};
+  function renderCase(card,photos,watermark,width=1080,createCanvas){
+    createCanvas=createCanvas||(()=>document.createElement('canvas'));
+    const canvas=createCanvas(),measure=createCanvas().getContext('2d');
+    const blue='#4f5ee8',dark='#202637',muted='#596276',lineH=44;
+    measure.font=font(72,600);const titles=wrap(measure,card.title||'案例标题',750);
+    const photoY=103+titles.length*86,pw=card.count===1?600:490,ph=pw*4/3;
+    const mainY=photoY+ph+24;
+    measure.font=font(28);const complaint=wrap(measure,card.complaint||'—',936);
+    const complaintH=94+complaint.length*lineH,detailY=mainY+complaintH+16;
+    const panelW=card.trainingEnabled?490:1000,innerW=panelW-56;
+    const treatment=wrap(measure,'处理次数：'+(card.treatmentCount??'—')+' 次',innerW).concat(wrap(measure,'处理区域：'+(card.area||'—'),innerW));
+    const training=card.trainingEnabled?wrap(measure,'训练次数：'+(card.trainingCount??'—')+' 次',innerW).concat(wrap(measure,'训练内容：'+(card.trainingContent||'—'),innerW)):[];
+    const detailH=94+Math.max(treatment.length,training.length)*lineH,scoreY=detailY+detailH+16,scoreH=242,height=scoreY+scoreH+74;
+    canvas.width=width;canvas.height=Math.ceil(height*width/1080);const ctx=canvas.getContext('2d');ctx.scale(width/1080,width/1080);
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,1080,height);ctx.fillStyle=blue;ctx.fillRect(40,32,5,30);ctx.font=font(30,600);ctx.fillText(card.brand||'星辰睿力',60,58,720);
+    ctx.textAlign='right';ctx.fillStyle=muted;ctx.font=font(26);ctx.fillText((card.date||'').replaceAll('-','.'),1040,58);
+    ctx.textAlign='left';ctx.font=font(72,600);ctx.fillStyle=dark;titles.forEach((line,i)=>ctx.fillText(line,40,145+i*86));
+    ctx.textAlign='right';ctx.font=font(32);ctx.fillStyle=muted;ctx.fillText('案例记录',1040,145);
+    const mark=watermark;
+    for(let i=0;i<card.count;i++){
+      const slot={x:card.count===1?(1080-pw)/2:40+i*(pw+20),y:photoY,w:pw,h:ph};
+      ctx.fillStyle='#e9eef6';ctx.fillRect(slot.x,slot.y,pw,ph);const p=photos[i];
+      if(p){const b=photoBounds(p.image,slot,p.fit,p.x??50,p.y??50);ctx.save();ctx.beginPath();ctx.rect(slot.x,slot.y,pw,ph);ctx.clip();ctx.drawImage(p.image,b.x,b.y,b.w,b.h);if(mark){const v=b.visible,inset=12,h=Math.max(0,Math.min(38,v.bottom-v.y-inset*2,(v.right-v.x-inset*2)*mark.height/mark.width)),w=h*mark.width/mark.height;ctx.globalAlpha=.75;ctx.drawImage(mark,v.right-inset-w,v.y+inset,w,h)}ctx.restore()}
+      else{ctx.textAlign='center';ctx.fillStyle='#8995a9';ctx.font=font(30);ctx.fillText('图片 '+(i+1),slot.x+pw/2,slot.y+ph/2)}
+      ctx.fillStyle=blue;ctx.fillRect(slot.x,slot.y,card.count===1?140:112,46);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font=font(26,600);ctx.fillText(card.count===1?'案例图片':'图片 '+(i+1),slot.x+(card.count===1?70:56),slot.y+32);
+    }
+    function panel(x,y,w,h,color='#f5f6fa'){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,18);ctx.fill()}
+    function heading(text,x,y){ctx.textAlign='center';ctx.fillStyle=blue;ctx.font=font(30,600);ctx.fillText('- '+text+' -',x,y)}
+    function text(lines,x,y){ctx.textAlign='left';ctx.fillStyle=dark;ctx.font=font(28);lines.forEach((line,i)=>ctx.fillText(line,x,y+i*lineH))}
+    panel(40,mainY,1000,complaintH);heading('主述',540,mainY+46);text(complaint,72,mainY+94);
+    panel(40,detailY,panelW,detailH);heading('手法处理',40+panelW/2,detailY+46);text(treatment,68,detailY+94);
+    if(card.trainingEnabled){panel(550,detailY,490,detailH);heading('训练记录',795,detailY+46);text(training,578,detailY+94)}
+    panel(40,scoreY,1000,scoreH,'#f0f2ff');heading('不适感自我评分',540,scoreY+48);
+    [card.beforeScore,card.afterScore].forEach((score,i)=>{const x=i?760:320;ctx.textAlign='center';ctx.fillStyle=i?blue:dark;ctx.font=font(96,600);ctx.fillText(score==null?'—':String(score),x-22,scoreY+155);ctx.font=font(32);ctx.fillStyle=muted;ctx.fillText('/ 10',x+76,scoreY+151);ctx.font=font(28);ctx.fillText(i?'处理后':'处理前',x+10,scoreY+204)});
+    ctx.strokeStyle='#8792ed';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(495,scoreY+129);ctx.lineTo(570,scoreY+129);ctx.lineTo(552,scoreY+113);ctx.moveTo(570,scoreY+129);ctx.lineTo(552,scoreY+145);ctx.stroke();
+    ctx.fillStyle='#929bad';ctx.font=font(18);ctx.textAlign='left';ctx.fillText('RSRC · COACHING TOOLS',40,height-28);ctx.textAlign='right';ctx.fillText(card.signature||'',1040,height-28,480);return canvas;
+  }
+  const api={render,renderMember,renderCase,photoBounds};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
   else root.CoachCardRenderer=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
